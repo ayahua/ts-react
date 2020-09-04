@@ -1,17 +1,14 @@
 import webpack from 'webpack'
+import { merge } from 'webpack-merge'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
-import { CleanWebpackPlugin } from 'clean-webpack-plugin'
-import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import UglifyjsWebpackPlugin from 'uglifyjs-webpack-plugin'
-import optimizeCssPlugin from 'optimize-css-assets-webpack-plugin'
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import baseConfig from './webpack.config.base'
 import * as paths from './paths.config'
 
-const isDev = process.argv.includes('--dev')
+process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
-const webpackConfig: webpack.Configuration = {
-  mode: isDev ? 'development' : 'production',
-  devtool: isDev ? 'cheap-module-eval-source-map' : 'cheap-module-source-map',
+const devConfig: webpack.Configuration = {
+  mode: 'development',
+  devtool: 'cheap-module-eval-source-map',
   entry: {
     main: './src/entries/index.tsx',
   },
@@ -37,15 +34,6 @@ const webpackConfig: webpack.Configuration = {
               plugins: ['@babel/plugin-syntax-dynamic-import'],
             },
           },
-          // {
-          //   loader: 'ts-loader',
-          //   options: {
-          //     compilerOptions: {
-          //       module: 'esNext',
-          //       sourceMap: isDev,
-          //     },
-          //   }
-          // },
         ],
         include: paths.SRC_DIR,
       },
@@ -53,22 +41,16 @@ const webpackConfig: webpack.Configuration = {
         test: /\.(css|less)$/,
         exclude: [/node_modules\//],
         use: [
-          isDev ? 'style-loader' : 
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              publicPath: '../'
-            }
-          },
+          'style-loader',
           {
             loader: 'cache-loader',
           },
           {
             loader: 'css-loader',
             options: {
-              sourceMap: !!isDev,
+              sourceMap: true,
               modules: {
-                localIdentName: isDev ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
+                localIdentName: '[name]-[local]-[hash:base64:5]',
               },
               importLoaders: 2,
             },
@@ -76,7 +58,7 @@ const webpackConfig: webpack.Configuration = {
           {
             loader: 'less-loader',
             options: {
-              sourceMap: !!isDev,
+              sourceMap: true,
               lessOptions: {
                 // javascriptEnabled: true,
                 paths: [paths.STYLES_DIR],
@@ -128,25 +110,6 @@ const webpackConfig: webpack.Configuration = {
       },
       hash: true,
     }),
-    new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ['**/*'],
-    }),
-    new MiniCssExtractPlugin({
-      filename: 'styles/[name].css'
-      // filename: 'styles/[name].[contenthash:8].css'
-    }),
-    new BundleAnalyzerPlugin({
-      analyzerMode: 'server',
-      analyzerHost: '127.0.0.1',
-      analyzerPort: 8888,
-      reportFilename: 'report.html',
-      defaultSizes: 'parsed',
-      openAnalyzer: true,
-      generateStatsFile: false,
-      statsFilename: 'stats.json',
-      statsOptions: null,
-      logLevel: 'info'
-    })
   ],
   devServer: {
     port: 6060,
@@ -162,29 +125,6 @@ const webpackConfig: webpack.Configuration = {
       '@': paths.SRC_DIR,
     },
   },
-  optimization: {
-    runtimeChunk: {
-      name: 'mainfest'
-    },
-    splitChunks: {
-      cacheGroups: {
-        default: false,
-        commons: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendor',
-          chunks: 'all'
-        }
-      }
-    },
-    minimizer: [
-      new UglifyjsWebpackPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: true
-      }),
-      new optimizeCssPlugin()
-    ]
-  }
 }
 
-export default webpackConfig
+export default merge(baseConfig, devConfig)
