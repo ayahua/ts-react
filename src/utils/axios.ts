@@ -18,6 +18,7 @@ type errorMessageMapKey = keyof typeof errorMessageMap
 
 function dispatchErrorMessage (desc: string) {
   // do somethings
+  // tslint:disable-next-line:no-console
   console.log(`network error! ${desc}`)
 }
 

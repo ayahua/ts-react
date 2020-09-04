@@ -7,7 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --config configs/webpack.config.dev.ts --progress",
     "build": "webpack --config configs/webpack.config.prod.ts --progress",
-    "analyzer": "webpack --config configs/webpack.config.prod.ts --progress --analyzer"
+    "analyzer": "webpack --config configs/webpack.config.prod.ts --progress --analyzer",
+    "lint:ts": "tslint \"{src, configs}/**/*.{ts, tsx}\"",
+    "lint:style": "stylelint \"{src, configs}/**/*.{less, css}\"",
+    "lint": "yarn lint:ts && yarn lint:style"
   },
   "repository": {
     "type": "git",
@@ -54,14 +57,22 @@
     "css-loader": "^4.2.2",
     "file-loader": "^6.1.0",
     "html-webpack-plugin": "^4.4.1",
+    "husky": "^4.2.5",
     "less": "^3.12.2",
     "less-loader": "^7.0.0",
+    "lint-staged": "^10.3.0",
     "mini-css-extract-plugin": "^0.11.0",
     "optimize-css-assets-webpack-plugin": "^5.0.4",
     "postcss-loader": "^3.0.0",
+    "prettier": "^2.1.1",
     "react-router-dom": "^5.2.0",
     "style-loader": "^1.2.1",
+    "stylelint": "^13.7.0",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-order": "^4.1.0",
     "ts-node": "^9.0.0",
+    "tslint": "^6.1.3",
+    "tslint-react": "^5.0.0",
     "typescript": "3",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "url-loader": "^4.1.0",
@@ -74,5 +85,20 @@
   "dependencies": {
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "tslint --fix",
+      "git add"
+    ],
+    "src/**/*.{less,css}": [
+      "stylelint --fix",
+      "git add"
+    ]
   }
 }

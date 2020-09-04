@@ -11,6 +11,8 @@ const App: React.SFC<AppProps> = (props: AppProps) => {
   return <>{children}</>
 }
 
-App.defaultProps = {}
+App.defaultProps = {
+
+}
 
 export default App

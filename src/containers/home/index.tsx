@@ -26,5 +26,4 @@ const Home: React.FC<HomeProps> = () => {
     </section>
   )
 }
-
 export default Home
